@@ -22,26 +22,12 @@ struct MemberCell: View {
                         .clipped()
                 } placeholder: {
                     ZStack {
-                        Image(systemName: "person.fill")
-                            .imageScale(.large)
-                            .font(.system(size: 100))
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical)
-                            .frame(height: 250)
-                            .background(.quaternary, in: Rectangle())
+                        placeholder
                         ProgressView()
                     }
                 }
             } else {
-                Image(systemName: "person.fill")
-                    .imageScale(.large)
-                    .font(.system(size: 100))
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .frame(height: 250)
-                    .background(.quaternary, in: Rectangle())
+                placeholder
             }
             
             VStack(alignment: .leading) {
@@ -60,6 +46,19 @@ struct MemberCell: View {
         .background(.white)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .shadow(color: .primary.opacity(0.1), radius: 2, x: 0, y: 1)
+    }
+}
+
+private extension MemberCell {
+    var placeholder: some View {
+        Image(systemName: "person.fill")
+            .imageScale(.large)
+            .font(.system(size: 100))
+            .foregroundColor(.secondary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical)
+            .frame(height: 250)
+            .background(.quaternary, in: Rectangle())
     }
 }
 
