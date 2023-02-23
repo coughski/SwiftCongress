@@ -19,7 +19,9 @@ final class MembersViewModel: ObservableObject {
                 case .failure(let error):
                     print(error.localizedDescription)
                 case .success(let response):
-                    self?.members = response.members.map(\.member)
+                    DispatchQueue.main.async {
+                        self?.members = response.members.map(\.member)
+                    }
             }
         }
     }
