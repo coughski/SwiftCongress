@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     let columns = Array(repeating: GridItem(.flexible()), count: 2)
-    @State private var members = [Member]()
+    
+    @StateObject private var viewModel = MembersViewModel()
     
     var body: some View {
         NavigationStack {
@@ -19,7 +20,7 @@ struct ContentView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(members) { member in
+                        ForEach(viewModel.members) { member in
                             NavigationLink {
                                 MemberDetail(member: member)
                             } label: {
@@ -29,12 +30,7 @@ struct ContentView: View {
                         }
                     }
                     .padding()
-                    .onAppear {
-                        NetworkingManager.shared.request { data in
-                            let serverResponse = try! JSONDecoder().decode(MemberResponse.self, from: data)
-                            members = serverResponse.members.map(\.member)
-                        }
-                    }
+                    .onAppear(perform: viewModel.load)
                 }
             }
             .navigationTitle("Members")

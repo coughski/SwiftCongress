@@ -11,21 +11,48 @@ class NetworkingManager {
     static let shared = NetworkingManager()
     private init() {}
     
-    func request(completionHandler: @escaping (Data) -> Void) {
-        let request = URLRequest(url: URL(string: "https://api.congress.gov/v3/member?api_key=\(CONGRESS_API_KEY)")!)
+    func request<T: Decodable>(_ absoluteURL: String, type: T.Type, completion: @escaping (Result<T, Error>) -> Void) {
+        guard let url = URL(string: absoluteURL) else {
+            completion(.failure(NetworkingError.invalidURL))
+            return
+        }
+        
+        let request = URLRequest(url: url)
         let dataTask = URLSession.shared.dataTask(with: request) { data, response, error in
-            guard error == nil else {
-                print(error)
+            if error != nil {
+                completion(.failure(NetworkingError.custom(error: error!)))
                 return
             }
             
-            if let response = response as? HTTPURLResponse, (200...300) ~= response.statusCode {
-                
+            guard let response = response as? HTTPURLResponse, (200...300) ~= response.statusCode else {
+                let statusCode = (response as! HTTPURLResponse).statusCode
+                completion(.failure(NetworkingError.invalidStatusCode(statusCode: statusCode)))
+                return
             }
                 
-            guard let data else { return }
-            completionHandler(data)
+            guard let data else {
+                completion(.failure(NetworkingError.invalidData))
+                return
+            }
+            
+            do {
+                let decoded = try JSONDecoder().decode(T.self, from: data)
+                completion(.success(decoded))
+            } catch {
+                completion(.failure(NetworkingError.failedToDecode(error: error)))
+                return
+            }
         }
         dataTask.resume()
+    }
+}
+
+extension NetworkingManager {
+    enum NetworkingError: Error {
+        case invalidURL
+        case custom(error: Error)
+        case invalidStatusCode(statusCode: Int)
+        case invalidData
+        case failedToDecode(error: Error)
     }
 }
