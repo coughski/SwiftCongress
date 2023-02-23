@@ -30,7 +30,7 @@ struct ContentView: View {
                         }
                     }
                     .padding()
-                    .onAppear(perform: viewModel.load)
+                    .onAppear(perform: viewModel.fetchMembers)
                 }
             }
             .navigationTitle("Members")

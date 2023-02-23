@@ -7,12 +7,12 @@
 
 import Foundation
 
-class MembersViewModel: ObservableObject {
-    @Published var members: [Member] = []
+final class MembersViewModel: ObservableObject {
+    @Published private(set) var members: [Member] = []
     
     private static let membersRequestURL = "https://api.congress.gov/v3/member?api_key=\(CONGRESS_API_KEY)"
     
-    func load() {
+    func fetchMembers() {
         NetworkingManager.shared.request(Self.membersRequestURL, type: MemberResponse.self) { [weak self] result in
             
             switch result {
